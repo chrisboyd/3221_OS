@@ -13,11 +13,13 @@ int main(void)
 {
     char *args[MAX_LINE/2 + 1];	/* command line (of 80) has max of 40 arguments */
     int should_run = 1;
-
+	
     while (should_run){
         printf("mysh:~$ ");
         fflush(stdout);
-
+		gets( args );
+		printf("you entered:  ");
+		puts( args );
         /**
           * After reading user input, the steps are:
           * (1) fork a child process
