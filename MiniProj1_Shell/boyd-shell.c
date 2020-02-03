@@ -1,8 +1,3 @@
-/* ----------------------------------------------------------------- */
-/* PROGRAM  shell.c                                                  */
-/*    This program reads in an input line, parses the input line     */
-/* into tokens, and use execvp() to execute the command.             */
-/* ----------------------------------------------------------------- */
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -28,14 +23,6 @@ bool isBackground(char **argv)
 	}
 	return bg;
 }
-/* ----------------------------------------------------------------- */
-/* FUNCTION  parse:                                                  */
-/*    This function takes an input line and parse it into tokens.    */
-/* It first replaces all white spaces with zeros until it hits a     */
-/* non-white space character which indicates the beginning of an     */
-/* argument.  It saves the address to argv[], and then skips all     */
-/* non-white spaces which constitute the argument.                   */
-/* ----------------------------------------------------------------- */
 
 void  parse(char *line, char **argv)
 {
@@ -49,19 +36,11 @@ void  parse(char *line, char **argv)
 	}
 	*argv = '\0';                 /* mark the end of argument list  */
 }
-
-/* ----------------------------------------------------------------- */
-/* FUNCTION execute:                                                 */
-/*    This function receives a commend line argument list with the   */
-/* first one being a file name followed by its arguments.  Then,     */
-/* this function forks a child process to execute the command using  */
-/* system call execvp().                                             */
-/* ----------------------------------------------------------------- */
-     
+  
 void  execute(char **argv, char *file)
 {
 	pid_t  pid;
-	int    status, i = 0;
+	int    status;
 	bool bg = isBackground(argv);
 	int fd;
 	
@@ -98,15 +77,51 @@ int getFD(char *filename)
 	return file_desc;
 }
 
-
-/* ----------------------------------------------------------------- */
-/*                  The main program starts here                     */
-/* ----------------------------------------------------------------- */
-    
+void executePipe(char **outputcmd, char **inputcmd)
+{
+	pid_t  pid1, pid2, wpid;
+	int fds[2], status;
+	pipe(fds);
+	
+	if ((pid1 = fork()) < 0) {     //fork a child process           
+		printf("*** ERROR: forking child process failed\n");
+		exit(1);
+	}
+	else if (pid1 == 0) {          // for the child process
+		//open up write on this end of the pipe
+		dup2(fds[0], 0);  
+		
+		 
+		if (execvp(*inputcmd, inputcmd) < 0) {     // execute the command 
+			printf("*** ERROR: exec failed\n");
+			exit(1);
+		}
+	}
+	else if ((pid2 = fork()) < 0) {
+		printf("*** ERROR: forking second child process failed\n");
+		exit(1);
+	}
+	else if (pid2 == 0){
+		dup2(fds[1], 1);
+		
+		if (execvp(*outputcmd, outputcmd) < 0) {     // execute the command 
+			printf("*** ERROR: exec failed\n");
+			exit(1);
+		}
+	}
+	else {                                      
+		while ((wpid = wait(&status)) > 0);
+	    close(fds[0]);
+	    close(fds[1]);
+	}
+}
+ 
 void  main(void)
 {
 	char line[MAX_LINE];             
 	char *argv[MAX_LINE/2 + 1];
+	char *inputcmd[MAX_LINE/2 + 1];
+	char *outputcmd[MAX_LINE/2 + 1];
 	char *trimmed[MAX_LINE/2 +1];
 	char lastcmd[MAX_LINE] = "";
 	char *source;
@@ -139,26 +154,45 @@ void  main(void)
 			strcpy(lastcmd, line);
 		
 		//need to parse strings returned by strtok to remove whitespace
+		//Potential cleanup: parse line before strtok, then remove index
+		//with < or >
 		if( strchr(line, '>') != NULL || strchr(line, '<') != NULL ){
 			source = strtok(line, "<>");
 			dest = strtok(NULL, "<>");
 			//remove trailing whitespace from source, can't use parse as
-			//that breaks things like "ls -al"
+			//that breaks things like "ls -al", put into line for 
+			//processing into argv
 			source[strlen(source) - 1] = '\0';
+			
 			//remove leading and trailing whitespace after strtok				
 			parse(dest, trimmed);
 			strcpy(dest, trimmed[0]);
+			
+			parse(source, argv); 
+			execute(argv, dest); 			
 		}
 		else if( strchr(line, '|') != NULL ){
-			source = strtok(line, "|");
-			dest = strtok(NULL, "|");
+			parse(line, trimmed);
+			int i = 0, j = 0;
 			
-			//parse(source, source);
+			while (strcmp(trimmed[i], "|") != 0){
+				outputcmd[i] = trimmed[i];
+				i++;
+			}
+			outputcmd[i] = NULL;
+			i++;
+			while (trimmed[i] != NULL){
+				inputcmd[j] = trimmed[i];
+				i++;
+				j++;
+			}
+			inputcmd[j] = NULL;
+			executePipe(outputcmd, inputcmd);
 		}
-		if (strcmp(line, "") != 0){
+		else if (strcmp(line, "") != 0){
 			//parse input and execute command
 			parse(line, argv); 
-			
+	
 			if (strcmp(argv[0], "exit") == 0)	
 				exit(0);  
 			execute(argv, dest); 
