@@ -1,16 +1,25 @@
 /*
 to be populated
 */
-#include <shell-func.h>
+
+#include <stdio.h>
+#include <sys/types.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <string.h>
+#include <stdbool.h>
 
 void parseInput(char *input_line, char **args)
 {
 	
 	int num_args = 1;
-	char * token = strtok(input_input_line, " ");
+	char * token = strtok(input_line, " ");
 	
 	while (token != NULL){
 		*args++ = token;
+		if(*args[strlen(*args) -1] == '\n')
+			*args[strlen(*args) -1] == '\0';
 		num_args++;
 		token = strtok(NULL, " ");
 	}
@@ -18,13 +27,6 @@ void parseInput(char *input_line, char **args)
 	
 }
 
-
-#include <shell-func.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <stdlib.h>
 
 #define MAX_LINE		80  //80 char per line
 
@@ -45,9 +47,11 @@ int main(void)
     while (should_run == 1){
         printf("mysh:~$ ");
         fflush(stdout);
-		getline(&input_line, &len, stdin);
+		fgets(input_line, MAX_LINE, stdin);
 		
 		parseInput(input_line, args);
+		if (input_line[strlen(input_line) - 1] == '\n')
+			input_line[strlen(input_line) - 1] = '\0';
 		
 		while (args[i] != NULL){
 			printf("item: %i :: %s\n", i, args[i]);
