@@ -58,26 +58,22 @@ void  parse(char *line, char **argv)
 /* system call execvp().                                             */
 /* ----------------------------------------------------------------- */
      
-void  execute(char **argv, int fd)
+void  execute(char **argv, char *file)
 {
 	pid_t  pid;
 	int    status, i = 0;
 	bool bg = isBackground(argv);
-	/*
-	while(argv[i] != NULL){
-		printf("Argv %i: %s\n", i,argv[i]);
-		i++;
-	}
-	*/
+	int fd;
 	
 	if ((pid = fork()) < 0) {     //fork a child process           
 		printf("*** ERROR: forking child process failed\n");
 		exit(1);
 	}
 	else if (pid == 0) {          // for the child process
-		if (fd > 0){
-			dup2(fd, STDOUT_FILENO);
-			printf("opened file \n");
+		if (file != NULL){
+			fd = open(file, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+			dup2(fd, 1);
+			close(fd);
 		}		         
 		if (execvp(*argv, argv) < 0) {     // execute the command 
 			printf("*** ERROR: exec failed\n");
@@ -94,13 +90,11 @@ void  execute(char **argv, int fd)
 int getFD(char *filename)
 {
 	int file_desc;
-	//filename,O_RDWR | O_APPEND | O_CREAT, 0666
 	if (file_desc = open(filename, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR) < 0){
 		printf("open failed: %s\n", filename);
 		exit(1);
 	}
-	else
-		printf("open worked: %s\n", filename);
+	
 	return file_desc;
 }
 
@@ -112,9 +106,9 @@ int getFD(char *filename)
 void  main(void)
 {
 	char line[MAX_LINE];             
-	char *argv[MAX_LINE/2 + 1];                
+	char *argv[MAX_LINE/2 + 1];
+	char *trimmed[MAX_LINE/2 +1];
 	char lastcmd[MAX_LINE] = "";
-	//char *split_redirect;
 	char *source;
 	char *dest;
 	int fd = 0;
@@ -122,7 +116,8 @@ void  main(void)
 	while (1) {                  
 		printf("BoydShell -> ");     
 		fflush(stdout);
-		
+		source = NULL;
+		dest = NULL;
 		//read command and remove new line
 		fgets(line, MAX_LINE, stdin);
 		printf("\n");
@@ -143,33 +138,31 @@ void  main(void)
 		else
 			strcpy(lastcmd, line);
 		
-		//check for > or <
-		if (strchr(line,'<') != NULL){
-			//works for argv
-			dest = strtok(line, "<");
-			source = strtok(NULL, "<");
-			fd = getFD(dest);
-			strcpy(line, source);
+		//need to parse strings returned by strtok to remove whitespace
+		if( strchr(line, '>') != NULL || strchr(line, '<') != NULL ){
+			source = strtok(line, "<>");
+			dest = strtok(NULL, "<>");
+			
+			//remove leading and trailing whitespace after strtok
+			parse(source, trimmed);
+			strcpy(line, trimmed[0]);
+			parse(dest, trimmed);
+			strcpy(dest, trimmed[0]);
 		}
-		else if( strchr(line, '>') != NULL){
-			//add extra arg for argv, insert \O into source?
-			source = strtok(line, ">");
-			dest = strtok(NULL, ">");
-			source[strlen(source) - 1] = '\0';
-			fd = getFD(dest);
-			strcpy(line, source);
-		}	
-		
+		else if( strchr(line, '|') != NULL ){
+			source = strtok(line, "|");
+			dest = strtok(NULL, "|");
+			
+			//parse(source, source);
+		}
 		if (strcmp(line, "") != 0){
 			//parse input and execute command
-			parse(line, argv);    
+			parse(line, argv); 
+			
 			if (strcmp(argv[0], "exit") == 0)	
 				exit(0);  
-			execute(argv, fd); 
-			if (fd > 0)
-				close(fd);
-		}  
-		
+			execute(argv, dest); 
+		}  		
 	}
 }
 

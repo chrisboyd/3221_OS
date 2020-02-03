@@ -1,0 +1,11 @@
+### Redirecting Input and Output
+Your shell should then be modified to support the `>` and `<` redirection operators, where `>` redirects the output 
+of a command to a file and `<` redirects the input to a command from a file. For example, if a user enters 
+```mysh:~$ ls > out.txt``` the output from the ls command will be redirected to the file `out.txt`. Similarly, input can be
+redirected as well. For example, if the user enters ```mysh:~$ sort < in.txt``` the file `in.txt` will serve as input to the
+`sort` command. Managing the redirection of both input and output will involve using the `dup2()` function, which
+duplicates an existing file descriptor to another file descriptor. For example, if fd is a file descriptor to the 
+file `out.txt`, the call ```dup2(fd, STDOUT FILENO);``` duplicates fd to standard output (the terminal). This means that
+any writes to standard output will in fact be sent to the `out.txt` file. You can assume that commands will contain
+either one input or one output redirection and will not contain both. In other words, you do **not** have to be concerned 
+with command sequences such as ```sort < in.txt > out.txt.```
