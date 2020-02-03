@@ -142,10 +142,10 @@ void  main(void)
 		if( strchr(line, '>') != NULL || strchr(line, '<') != NULL ){
 			source = strtok(line, "<>");
 			dest = strtok(NULL, "<>");
-			
-			//remove leading and trailing whitespace after strtok
-			parse(source, trimmed);
-			strcpy(line, trimmed[0]);
+			//remove trailing whitespace from source, can't use parse as
+			//that breaks things like "ls -al"
+			source[strlen(source) - 1] = '\0';
+			//remove leading and trailing whitespace after strtok				
 			parse(dest, trimmed);
 			strcpy(dest, trimmed[0]);
 		}
