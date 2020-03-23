@@ -1,3 +1,6 @@
-//char *int2bin(int n);
-int bin2dec(int n);
-int dec2bin(int n);
+char *int2bin(int n);
+long bin2dec(char *n);
+long dec2bin(int n);
+int get_offset(char *n);
+int get_page(char *n);
+//long pow_of_ten(int n);
