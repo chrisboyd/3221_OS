@@ -13,69 +13,70 @@
 #include <math.h>
 #include "mmu.h"
 
-//unsigned int mask = 11111111;
+static int FRAME_SIZE = 256;
 
 int main(int argc, char *argv[])
 {
 	if (argc < 3){
 		printf("Missing Argument:\n");
 		printf("Usage: ./mmu file.bin addresses.txt\n");
-		exit(1);
+		return -1;
 	}
 	
     FILE *log_addr;
+	FILE *csv_out;
+	FILE *backing;
     log_addr = fopen(argv[2],"r");
+	csv_out = fopen("output.csv", "w");
+	backing = fopen("BACKING_STORE.bin", "rb");
+	if (log_addr == NULL){
+		printf("Could not open: %s\n", argv[2]);
+		return -1;
+	}
+	if (csv_out == NULL){
+		printf("Could not open output.csv\n");
+		return -1;
+	}
    	int addr = 0;
-	int j = 0;
 	char *bin;
 	char page_bin[9];
 	char offset_bin[9];
-	char *eptr;
-	long page, offset;
+	long page, offset, physical;
+	long page_table[256];
+	char byte_read;
+	int j = 0;
+	
 	memset(page_bin, '\0', sizeof(page_bin));
 	memset(offset_bin, '\0', sizeof(offset_bin));
+	memset(page_table, 0, sizeof(page_table));
 	
-	while (j < 10){
-		fscanf(log_addr, "%d", &addr);
+	while ( fscanf(log_addr, "%d", &addr) != EOF){
+		//get full binary of first address		
 		bin = int2bin(addr);
-		printf("%d -> %s\n", addr, bin);
+		//get binary of the page number
 		strncpy(page_bin, bin, 8);
+		//get binary of the offset
 		strncpy(offset_bin, bin + 8, 8);
-		printf("page\t %s\n", page_bin);
-		printf("offset\t\t %s\n", offset_bin);
-		page = strtol(page_bin, &eptr, 2);
-		offset = strtol(offset_bin, &eptr, 2);
-		printf("page: %ld\n", page);
-		printf("offset: %ld\n", offset);
-		j++;
+		//convert binary page number and offset to decimal
+		page = strtol(page_bin, NULL, 2);
+		offset = strtol(offset_bin, NULL, 2);
+		if ( page_table[page] == 0){
+			page_table[page] = page;
+		}
+		fseek(backing, physical, SEEK_SET);
+		fread(&byte_read, sizeof(char), 1, backing);
+		physical = page * FRAME_SIZE + offset;
+		/*
+		printf("logical: %d, ", addr);
+		printf("page: %ld, ", page);
+		printf("offset: %ld, ", offset);
+		printf("physical: %ld, ", physical);
+		*/
+		printf("%i\n", byte_read);
 	}
-	printf("256 binary: %ld", bin2dec(bin) );
+	
     fclose(log_addr);
     return 0;
-}
-
-int get_offset(char *n){
-	int offset = 0;
-	unsigned int bit_mask = 1;
-	return 0;
-}
-
-int get_page(char *n){
-	
-}
-
-long bin2dec(char *n){
-	int decimalnum = atol("100000000"), temp = 0, remainder;
- /* 
-    while (binarynum!=0)
-    {
-        remainder = binarynum % 10;
-        binarynum = binarynum / 10;
-        decimalnum = decimalnum + remainder*pow(2,temp);
-        temp++;
-    }
-	*/
-    return decimalnum;
 }
 
 char *int2bin(int n) {
