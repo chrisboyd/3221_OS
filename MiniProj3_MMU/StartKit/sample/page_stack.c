@@ -2,7 +2,7 @@
 #include <stdlib.h> 
 #include "page_stack.h"
 
-void append(Page** head, long new_frame){
+Page* append(Page** head, long new_frame){
 	Page* new_node = (Page*) malloc(sizeof(Page));
 	Page* temp = *head;
 	new_node->frame = new_frame;
@@ -18,7 +18,7 @@ void append(Page** head, long new_frame){
 		temp->next = new_node;
 		new_node->prev = temp;
 	}
-	return;
+	return new_node;
 }
 
 void insert_tail(Page** tail, long new_frame){
@@ -28,8 +28,8 @@ void insert_tail(Page** tail, long new_frame){
 	new_node->next = NULL;
 	(*tail)->next = new_node;
 	*tail = new_node;
-	
 }
+
 
 void move_page_top(Page** head, Page** accessed){
 	if ((*accessed)->next != NULL)	
@@ -51,7 +51,6 @@ Page* get_tail(Page** head){
 		temp = temp->next;
 	
 	return temp;
-	
 }
 
 
