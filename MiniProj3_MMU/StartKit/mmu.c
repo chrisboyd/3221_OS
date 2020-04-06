@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
 	
 	memset(page_bin, '\0', sizeof(page_bin));
 	memset(offset_bin, '\0', sizeof(offset_bin));
-	memset(page_table, 0, sizeof(page_table));
-	memset(tlb_table, 0, sizeof(tlb_table));
+	memset(page_table, -1, sizeof(page_table));
+	memset(tlb_table, -1, sizeof(tlb_table));
 		
 	while ( fscanf(log_addr, "%d", &addr) != EOF){
 		//get full binary of first address		
@@ -71,10 +71,10 @@ int main(int argc, char *argv[])
 		offset = strtol(offset_bin, NULL, 2);
 		
 		//check if page is in TLB table, tlb hit
-		frame = 0;
+		frame = -1;
 		i = 0;
 		
-		while(i < TLB_SIZE && frame == 0){
+		while(i < TLB_SIZE && frame == -1){
 			temp_page = tlb_table[i] / FRAME_SIZE;
 			if ( temp_page == page){
 				frame = tlb_table[i];
@@ -84,9 +84,9 @@ int main(int argc, char *argv[])
 		}
 		
 		//tlb miss	
-		if (frame == 0){
+		if (frame == -1){
 			//get frame number from page table
-			if ( page_table[page] == 0){
+			if ( page_table[page] == -1){
 				page_table[page] = page;
 				page_faults++;
 				frame = page_table[page];
