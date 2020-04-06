@@ -999,4 +999,4 @@
 126
 -46
 Page Faults = 244
-TLB Hits = 55
+TLB Hits = 54

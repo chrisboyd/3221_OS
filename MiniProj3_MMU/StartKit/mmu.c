@@ -52,7 +52,6 @@ int main(int argc, char *argv[])
 	int tlb_entries = 0;
 	int tlb_hits = 0;
 	int tlb_replace = 0;
-	long temp_page = 0;
 	
 	memset(page_bin, '\0', sizeof(page_bin));
 	memset(offset_bin, '\0', sizeof(offset_bin));
@@ -73,10 +72,8 @@ int main(int argc, char *argv[])
 		//check if page is in TLB table, tlb hit
 		frame = -1;
 		i = 0;
-		
 		while(i < TLB_SIZE && frame == -1){
-			temp_page = tlb_table[i] / FRAME_SIZE;
-			if ( temp_page == page){
+			if ( tlb_table[i] == page){
 				frame = tlb_table[i];
 				tlb_hits++;
 			}
@@ -98,19 +95,19 @@ int main(int argc, char *argv[])
 			else{
 				frame = page_table[page];
 			}
-			/*
+			
 			//update tlb with frame number retrieved from page_table
 			//check if tlb has empty space
 			if ( tlb_entries < TLB_SIZE ){
-				tlb_table[tlb_entries] = page * FRAME_SIZE;
+				tlb_table[tlb_entries] = page;
 				tlb_entries++;
 			}
 			//if tlb is full, replace using FIFO
 			else {
-				tlb_table[tlb_replace] = page * FRAME_SIZE;
+				tlb_table[tlb_replace] = page;
 				tlb_replace = (tlb_replace + 1) % TLB_SIZE;
 			}
-			*/
+		
 		}
 		//have looked up address, now read a byte of 
 		//data
