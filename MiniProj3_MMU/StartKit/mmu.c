@@ -18,24 +18,29 @@ static int TLB_SIZE = 16;
 
 int main(int argc, char *argv[])
 {
-	if (argc < 3){
+	if (argc < 4){
 		printf("Missing Argument:\n");
-		printf("Usage: ./mmu BACKING_STORE.bin addresses.txt\n");
+		printf("Usage: ./mmu BACKING_STORE.bin addresses.txt 128|256\n");
 		return -1;
 	}
 	
     FILE *log_addr;
 	FILE *csv_out;
 	FILE *backing;
+	backing = fopen(argv[1], "rb");
     log_addr = fopen(argv[2],"r");
 	csv_out = fopen("output.csv", "w");
-	backing = fopen("BACKING_STORE.bin", "rb");
 	if (log_addr == NULL){
 		printf("Could not open: %s\n", argv[2]);
 		return -1;
 	}
 	if (csv_out == NULL){
 		printf("Could not open output.csv\n");
+		return -1;
+	}
+	long page_table_size = strtol(argv[3], NULL, 10);
+	if (page_table_size != 128 && page_table_size != 256 ) {
+		printf("%ld is an invalid page table size. Choose 128 or 256\n", page_table_size);
 		return -1;
 	}
 	char phys_mem[FRAME_SIZE][FRAME_SIZE * sizeof(char)];
