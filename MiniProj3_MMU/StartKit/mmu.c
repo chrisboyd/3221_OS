@@ -58,9 +58,7 @@ int main(int argc, char *argv[])
 	memset(offset_bin, '\0', sizeof(offset_bin));
 	memset(page_table, 0, sizeof(page_table));
 	memset(tlb_table, 0, sizeof(tlb_table));
-	printf("\nSize of array index: %lu\n", sizeof(phys_mem[0]));
-	printf("\nSize of array whole: %lu\n", sizeof(phys_mem));
-	
+		
 	while ( fscanf(log_addr, "%d", &addr) != EOF){
 		//get full binary of first address		
 		bin = int2bin(addr);
@@ -75,7 +73,7 @@ int main(int argc, char *argv[])
 		//check if page is in TLB table, tlb hit
 		frame = 0;
 		i = 0;
-		/*
+		
 		while(i < TLB_SIZE && frame == 0){
 			temp_page = tlb_table[i] / FRAME_SIZE;
 			if ( temp_page == page){
@@ -84,14 +82,18 @@ int main(int argc, char *argv[])
 			}
 			i++;
 		}
-		*/
+		
 		//tlb miss	
 		if (frame == 0){
 			//get frame number from page table
 			if ( page_table[page] == 0){
-				page_table[page] = page * FRAME_SIZE;
+				page_table[page] = page;
 				page_faults++;
 				frame = page_table[page];
+				//read in 256 bytes from BACKING_STORE.bin
+				physical = page * FRAME_SIZE;
+				fseek(backing, physical, SEEK_SET);
+				fread(&phys_mem[page], sizeof(char), 256, backing);
 			}
 			else{
 				frame = page_table[page];
@@ -112,13 +114,9 @@ int main(int argc, char *argv[])
 		}
 		//have looked up address, now read a byte of 
 		//data
-		physical = frame + offset;
-		fseek(backing, physical, SEEK_SET);
-		fread(&byte_read, sizeof(char), 1, backing);
 		
-		/*for std out
+		byte_read = phys_mem[frame][offset];
 		printf("%i\n", byte_read);
-		*/
 		fprintf(csv_out,"%d,%ld,%i\n", addr, physical, byte_read);
 		
 	}
