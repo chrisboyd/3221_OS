@@ -1,0 +1,110 @@
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+
+tlb hit
+Page Faults = 244
+TLB Hits = 54
