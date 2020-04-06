@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS= -Wall
 DEPS = 	
-OBJFILES = struct.o test.o
+OBJFILES = page_stack.o test.o
 TARGET = test
 
 all: $(TARGET)

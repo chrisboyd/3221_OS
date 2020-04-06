@@ -1,28 +1,50 @@
 #include <math.h>
 #include <stdio.h>
-#include "struct.h"
+#include "page_stack.h"
 
 long long convert(int n);
 int main() {
     int n = 6;
 	Page* head = NULL;
-	
+	Page* tmp = NULL;
+	Page* tail = NULL;
 	
 	for (int i = 0; i < n; i++){
 		append(&head, i);
 	}
+	printf("pre swap:\n");
 	Page* itr = head;
-	while (itr->next != NULL){
+	while (itr != NULL){
+		if (itr->next == NULL)
+			tmp = itr;
+		printf("%ld, ", itr->frame);
+		itr = itr->next;
+		
+	}
+	printf("\n");
+	move_page_top(&head, &tmp);
+	printf("post swap1:\n");
+
+	itr = head;
+	while (itr != NULL){
+		printf("%ld, ", itr->frame);
+		itr = itr->next;
+	}
+	
+	tmp = head->next->next;
+	
+	move_page_top(&head, &tmp);
+	printf("\npost swap2 and add tail:\n");
+	tail = get_tail(&head);
+	insert_tail(&tail, 55);
+	itr = head;
+	while (itr != NULL){
 		printf("%ld, ", itr->frame);
 		itr = itr->next;
 	}
 	printf("\n");
-	printf("preswap: %ld, %ld\n", head->frame, itr->frame);
-	swap_pages(&head, &(itr));
-	printf("postswap: %ld, %ld\n", head->frame, itr->frame);
 	
-	
-		
+	//printf("idexing?: %ld, %ld\n", head[0].frame, head[1].frame);	
     /*
 	printf("Enter a decimal number: ");
     scanf("%d", &n);

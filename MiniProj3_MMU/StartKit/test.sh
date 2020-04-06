@@ -1,7 +1,9 @@
 #!/bin/bash -e
+echo "Cleaning"
+make clean
 echo "Compiling"
-gcc mmu.c -o mmu
-echo "Running 128 page frames"
-./mmu BACKING_STORE.bin addresses.txt 128 > out_128.txt
+make
+echo "Running"
+./mmu BACKING_STORE.bin addresses.txt 256 > out_256.txt
 echo "Comparing"
-diff out_128.txt correct.txt
+diff out_256.txt correct.txt

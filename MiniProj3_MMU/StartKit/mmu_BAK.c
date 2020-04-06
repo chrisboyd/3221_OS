@@ -12,6 +12,7 @@
 #include <string.h>
 #include <math.h>
 #include "mmu.h"
+#include "struct.h"
 
 static int FRAME_SIZE = 256;
 static int TLB_SIZE = 16;

@@ -5,4 +5,7 @@ typedef struct Page_list{
 }Page;
 
 void append(Page** head, long new_frame);
-void swap_pages(Page** top, Page **bottom);
+void move_page_top(Page** top, Page **accessed);
+Page* get_tail(Page** head);
+void insert_tail(Page** tail, long new_frame);
+

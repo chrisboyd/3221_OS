@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS= -Wall
 DEPS = 	
-OBJFILES = struct.o test.o mmu.o
+OBJFILES = page_stack.o mmu.o
 TARGET = mmu
 
 all: $(TARGET)
