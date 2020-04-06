@@ -1,8 +1,8 @@
 CC=gcc
 CFLAGS= -Wall
 DEPS = 	
-OBJFILES = struct.o test.o mmu.o
-TARGET = mmu
+OBJFILES = struct.o test.o
+TARGET = test
 
 all: $(TARGET)
 $(TARGET): $(OBJFILES)

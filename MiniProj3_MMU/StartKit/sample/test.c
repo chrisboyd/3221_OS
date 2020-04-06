@@ -1,12 +1,28 @@
 #include <math.h>
 #include <stdio.h>
+#include "struct.h"
+
 long long convert(int n);
 int main() {
     int n = 6;
-	char a[]  = { 'A', 'B', 'C', 'D', 'E', 'F' };
-	for (int i = 0; i < 10; i++){
-		printf("%c, ", a[(i+2)%6]);
+	Page* head = NULL;
+	
+	
+	for (int i = 0; i < n; i++){
+		append(&head, i);
 	}
+	Page* itr = head;
+	while (itr->next != NULL){
+		printf("%ld, ", itr->frame);
+		itr = itr->next;
+	}
+	printf("\n");
+	printf("preswap: %ld, %ld\n", head->frame, itr->frame);
+	swap_pages(&head, &(itr));
+	printf("postswap: %ld, %ld\n", head->frame, itr->frame);
+	
+	
+		
     /*
 	printf("Enter a decimal number: ");
     scanf("%d", &n);
