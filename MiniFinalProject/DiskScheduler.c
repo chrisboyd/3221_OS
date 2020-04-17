@@ -48,4 +48,11 @@ int main(int argc, char *argv[]){
 	
 	//perform C-SCAN seek on request adresses
 	c_scan_mvmt = c_scan(requests, c_scan_results);
+	fprintf(output, "\nC_SCAN Algorithm\n");
+	fprintf(output, "Initial head position = %d\n", INIT_HEAD_POSITION);
+	fprintf(output, "Seek Sequence is:\n");
+	for (int j = 0; j < NUM_REQUESTS; j++){
+		fprintf(output, "%d\n", c_scan_results[j]);
+	}
+	fprintf(output, "Total head movement for C_SCAN = %d", c_scan_mvmt);
 }
