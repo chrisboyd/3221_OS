@@ -36,6 +36,7 @@ int main(int argc, char *argv[]) {
 	int tlb_entries = 0;
 	int tlb_hits = 0;
 	int tlb_replace = 0;
+	double addr_read = 0.0;
 
 	if (argc < 4) {
 		printf("Missing Argument:\n");
@@ -76,6 +77,7 @@ int main(int argc, char *argv[]) {
 	memset(tlb_table, -1, sizeof(tlb_table));
 
 	while (fscanf(log_addr, "%d", &addr) != EOF) {
+		addr_read++;
 		//get full binary of first address		
 		bin = int2bin(addr);
 		//get binary of the page number
@@ -157,7 +159,7 @@ int main(int argc, char *argv[]) {
 				byte_read);
 	}
 	//statistics of page faults and TLB hits
-	printf("Page Faults = %d\n", page_faults);
+	printf("Page Faults = %.2f%%\n", (page_faults/addr_read)*100);
 	printf("TLB Hits = %d\n", tlb_hits);
 
 	//close input/output files
