@@ -12,7 +12,7 @@ int fcfs(int inputs[], int outputs[]){
 }
 
 int scan(int inputs[], int outputs[]){
-	int j = 0, switch_index = 0, mvmt; 
+	int j = 0, switch_index = 0, mvmt = 0; 
 	int *start_sort;	
 	//get all elements of input that scan would read going from 
 	//INIT_HEAD_POSITION to 0
@@ -42,11 +42,16 @@ int scan(int inputs[], int outputs[]){
 	//moving head from 0 to end
 	qsort(start_sort, (NUM_REQUESTS - switch_index), sizeof(int), compare_increasing);
 	
+	if (switch_index == 0){
+		mvmt += (2 * INIT_HEAD_POSITION);
+	}
 	//determine head movement
-	mvmt = abs((INIT_HEAD_POSITION - outputs[0]));
+	mvmt += abs((INIT_HEAD_POSITION - outputs[0]));
 	for (int i= 1; i < NUM_REQUESTS; i++){
-		if (i == switch_index - 1)
+		if (i == switch_index - 1){
 			mvmt += 2 * (outputs[i]);
+			//printf("switch: %d, out: %d\n\n", i, outputs[i]);
+		}
 		mvmt += abs((outputs[i] - outputs[i-1]));
 	}
 	return mvmt;
@@ -84,15 +89,28 @@ int c_scan(int inputs[], int outputs[]){
 	qsort(start_sort, (NUM_REQUESTS - switch_index), sizeof(int), compare_increasing);
 	
 	//determine head movement
-	mvmt = abs((INIT_HEAD_POSITION - outputs[0]));
+	if (switch_index == 0){
+		mvmt += (99 - INIT_HEAD_POSITION) + 99;
+		mvmt += outputs[0];
+		
+	}
+	else{
+		mvmt += abs((INIT_HEAD_POSITION - outputs[0]));
+		//special case where all requests are to the right of the init head
+		//position and last request is at the end of the cylinder, head
+		//immediately moves to start of the cylinder
+		if (switch_index == 25 && outputs[NUM_REQUESTS - 1] == 99)
+			mvmt += 99;
+		
+	}
 	for (int i= 1; i < NUM_REQUESTS; i++){
-		if (i == switch_index - 1)
+		if (i == switch_index - 1 && switch_index != NUM_REQUESTS)
 			mvmt += ((outputs[i] - outputs[i-1])) + (99 - outputs[i]);
 		else if (i == switch_index)
 			mvmt += 99 + outputs[i];
 		else
 			mvmt += abs((outputs[i] - outputs[i-1]));
-		//printf("i: %d, out: %d, mvmt: %d\n", i, outputs[i], mvmt);
+		//printf("i: %d, out: %d, mvmt: %d, switch: %d\n", i, outputs[i], mvmt, switch_index);
 	}
 	return mvmt;
 }

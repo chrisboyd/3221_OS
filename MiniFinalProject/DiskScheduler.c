@@ -1,18 +1,24 @@
 #include "DiskAlgorithms.h"
 
 int main(int argc, char *argv[]){
-	FILE *disk_input = fopen("input.txt", "r");
-	FILE *output = fopen("output.txt", "w");
 	int cylinder = 0, i = 0, fcfs_mvmt, scan_mvmt, c_scan_mvmt;
 	int requests[NUM_REQUESTS], fcfs_results[NUM_REQUESTS], 
 		scan_results[NUM_REQUESTS], c_scan_results[NUM_REQUESTS];
 	
+	if (argc < 3){
+		printf("Missing argument\n");
+		printf("Usage: ./disk_sched input.txt output.txt\n");
+		return -1;
+	}
+	FILE *disk_input = fopen(argv[1], "r");
+	FILE *output = fopen(argv[2], "w");
+	
 	if (disk_input == NULL){
-		printf("Could not open: input.txt\n");
+		printf("Could not open: %s\n", argv[1]);
 		return -1;
 	}
 	if (output == NULL){
-		printf("Could not open: output.txt\n");
+		printf("Could not open: %s\n", argv[2]);
 		return -1;
 	}
 	
